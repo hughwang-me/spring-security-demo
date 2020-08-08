@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -25,18 +26,29 @@ public class AuthUserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
 
+        log.warn("处理认证:{}" , s);
+
         UserEntity queryUserEntity = new UserEntity();
         queryUserEntity.setUsername(s);
         UserEntity userEntity = userMapper.selectOne(queryUserEntity);
         if(userEntity == null){
             log.warn("用户不存在");
             throw new UsernameNotFoundException("User " + s + " was not found in db");
+        }else {
+            log.warn("存在用户:{}" , userEntity.toString());
         }
         Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_ADMIN");
-        grantedAuthorities.add(grantedAuthority);
+//        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_ADMIN");
+        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+//        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_NORMAL"));
+        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
-        User user = new User(s, userEntity.getPassword() , grantedAuthorities);
-        return user;
+//        grantedAuthorities.add(grantedAuthority);
+
+//        User user = new User(s, "111" , grantedAuthorities);
+        UserDetails userDetails =new User(s,
+                new BCryptPasswordEncoder().encode(userEntity.getPassword()),
+                grantedAuthorities);
+        return userDetails;
     }
 }
