@@ -3,7 +3,9 @@ package com.uwjx.springsecurity.controller;
 import com.uwjx.springsecurity.dao.UserMapper;
 import com.uwjx.springsecurity.domain.entity.UserEntity;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -18,7 +20,7 @@ public class AdminController {
     UserMapper userMapper;
 
     @RequestMapping("/user")
-    public String test(){
+    public String test(@RequestParam("name")String name){
 
         List<UserEntity> users = userMapper.selectAll();
         users.forEach(user -> {
