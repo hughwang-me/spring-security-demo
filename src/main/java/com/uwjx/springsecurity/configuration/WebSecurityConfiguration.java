@@ -24,33 +24,38 @@ import javax.annotation.Resource;
 @Slf4j
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Resource
-    LoginSuccessHandler loginSuccessHandler;
-    @Resource
-    LoginFailureHandler loginFailureHandler;
-    @Resource
-    AuthAccessDeniedHandler authAccessDeniedHandler;
-    @Resource
-    JwtTokenFilter jwtTokenFilter;
+//    @Resource
+//    LoginSuccessHandler loginSuccessHandler;
+//    @Resource
+//    LoginFailureHandler loginFailureHandler;
+//    @Resource
+//    AuthAccessDeniedHandler authAccessDeniedHandler;
+//    @Resource
+//    JwtTokenFilter jwtTokenFilter;
+//
+//    @Resource
+//    AuthUserDetailService authUserDetailService;
 
-    @Resource
-    AuthUserDetailService authUserDetailService;
-
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        log.warn("开始认证@@@@@@@@@@@@@@@@@@");
-        auth.userDetailsService(authUserDetailService).passwordEncoder(new BCryptPasswordEncoder());
-//        auth.inMemoryAuthentication()
-//                .passwordEncoder(NoOpPasswordEncoder.getInstance())
-//                .withUser("admin")
-//                .password("123456")
-//                .roles("ADMIN")
-//                .and()
-//                .withUser("wanghuan")
-//                .password("123456")
-//                .roles("NORMAL");
+    @Bean
+    BCryptPasswordEncoder encoder(){
+        return new BCryptPasswordEncoder();
     }
+
+
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        log.warn("开始认证@@@@@@@@@@@@@@@@@@");
+//        auth.userDetailsService(authUserDetailService).passwordEncoder(new BCryptPasswordEncoder());
+////        auth.inMemoryAuthentication()
+////                .passwordEncoder(NoOpPasswordEncoder.getInstance())
+////                .withUser("admin")
+////                .password("123456")
+////                .roles("ADMIN")
+////                .and()
+////                .withUser("wanghuan")
+////                .password("123456")
+////                .roles("NORMAL");
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -60,6 +65,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/admin/**").permitAll()
                 .antMatchers("/req/**").permitAll()
+//                .antMatchers("/code").permitAll()
                 .antMatchers("/test/a").hasRole("USER")
                 .antMatchers("/test/b").hasRole("ADMIN")
                 .antMatchers("/test/c").access("hasRole('ROLE_NORMAL')")
@@ -68,19 +74,20 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                     .formLogin()
-                    .successHandler(loginSuccessHandler)
-                    .failureHandler(loginFailureHandler)
-                    .permitAll()
-                .and()
-                    .logout()
-                    .permitAll()
-        ;
-
-//        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);//禁用Session
-        http.csrf().disable();
-        http.exceptionHandling().accessDeniedHandler(authAccessDeniedHandler);
-
-        http.addFilterBefore(jwtTokenFilter , UsernamePasswordAuthenticationFilter.class);
+                    .loginPage("/static/login.html")
+//                    .successHandler(loginSuccessHandler)
+//                    .failureHandler(loginFailureHandler)
+                    .permitAll();
+//                .and()
+//                    .logout()
+//                    .permitAll()
+//        ;
+//
+////        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);//禁用Session
+//        http.csrf().disable();
+//        http.exceptionHandling().accessDeniedHandler(authAccessDeniedHandler);
+//
+//        http.addFilterBefore(jwtTokenFilter , UsernamePasswordAuthenticationFilter.class);
 
     }
 

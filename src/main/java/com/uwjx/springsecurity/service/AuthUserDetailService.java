@@ -3,6 +3,7 @@ package com.uwjx.springsecurity.service;
 import com.uwjx.springsecurity.dao.UserMapper;
 import com.uwjx.springsecurity.domain.entity.UserEntity;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -22,6 +23,7 @@ public class AuthUserDetailService implements UserDetailsService {
 
     @Resource
     UserMapper userMapper;
+
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
@@ -46,8 +48,11 @@ public class AuthUserDetailService implements UserDetailsService {
 //        grantedAuthorities.add(grantedAuthority);
 
 //        User user = new User(s, "111" , grantedAuthorities);
+
+        String password = new BCryptPasswordEncoder().encode("123456");
+        log.warn("password -> {}" , password);
         UserDetails userDetails =new User(s,
-                new BCryptPasswordEncoder().encode(userEntity.getPassword()),
+                password,
                 grantedAuthorities);
         return userDetails;
     }
